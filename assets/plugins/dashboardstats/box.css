@@ -1,0 +1,21 @@
+.statbox {
+width: 100%;
+	padding:0px 10px 0 10px;
+	margin-bottom: 0px;
+    margin-top:10px;
+    color: #FFFFFF;
+	display:block;
+	border-radius: 6px;
+	height: 68px;
+	overflow: hidden;
+}
+.statcontainer {width: 100%;}
+.staticon{float:left; padding:10px 5px 5px;}
+.staticon i{color: #FFFFFF!important; font-size:45px;}
+.count{padding:0; float:right; text-align:right;  margin-top: -15px;}
+.count h3{font-size:30px; margin-bottom: 2px;}
+
+.sred {background-color:  #d9534f;}
+.syellow {background-color: #f0ad4e;}
+.sgreen {background-color: #5cb85c;}
+.sblue {background-color: #428bca;}

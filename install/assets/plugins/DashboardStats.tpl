@@ -4,7 +4,7 @@
  * Dashboard Stats widget plugin for Evolution
  * @author    Nicola Lambathakis
  * @category    plugin
- * @version    3.1 beta1
+ * @version    3.1 beta2
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @internal    @events OnManagerWelcomeHome,OnManagerMainFrameHeaderHTMLBlock
  * @internal    @installset base
@@ -21,7 +21,7 @@ $role = $_SESSION['mgrRole'];
 if(($role!=1) AND ($wdgVisibility == 'AdminOnly')) {}
 else {
 // get language
-global $_lang;
+global $modx,$_lang;
 // get plugin id
 $result = $modx->db->select('id', $this->getFullTableName("site_plugins"), "name='{$modx->event->activePlugin}' AND disabled=0");
 $pluginid = $modx->db->getValue($result);
@@ -45,9 +45,9 @@ $wgn= $modx->getFullTableName('webgroup_names');
 $wg= $modx->getFullTableName('web_groups');
 
 if($webGroup == "all") {
-  $sql= "SELECT (id) FROM {$wua} wua ORDER BY wua.fullname ASC";
+  $sql= "SELECT (wua.id) FROM {$wua} wua ORDER BY wua.fullname ASC";
 } else {
-  $sql= "SELECT (id) FROM {$wua} wua JOIN {$wg} wg ON wg.webuser = wua.internalKey JOIN {$wgn} wgn ON wgn.name
+  $sql= "SELECT (wua.id) FROM {$wua} wua JOIN {$wg} wg ON wg.webuser = wua.internalKey JOIN {$wgn} wgn ON wgn.name
 
 = '{$webGroup}' AND wgn.id = wg.webgroup ORDER BY wua.fullname ASC";
 }

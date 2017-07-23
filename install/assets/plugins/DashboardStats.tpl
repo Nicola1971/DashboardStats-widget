@@ -1,7 +1,7 @@
 /**
  * DashboardStats 3.1 beta1
  *
- * Dashboard Stats widget plugin for Evolution
+ * Dashboard Stats widget plugin for Evolution CMS
  * @author    Nicola Lambathakis
  * @category    plugin
  * @version    3.1 beta2

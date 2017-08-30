@@ -1,10 +1,10 @@
 /**
- * DashboardStats 3.1 beta1
+ * DashboardStats
  *
  * Dashboard Stats widget plugin for Evolution CMS
  * @author    Nicola Lambathakis
  * @category    plugin
- * @version    3.1 beta2
+ * @version    3.1 rc2
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @internal    @events OnManagerWelcomeHome,OnManagerMainFrameHeaderHTMLBlock
  * @internal    @installset base

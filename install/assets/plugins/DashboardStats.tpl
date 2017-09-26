@@ -4,7 +4,7 @@
  * Dashboard Stats widget plugin for Evolution CMS
  * @author    Nicola Lambathakis
  * @category    plugin
- * @version    3.1 rc2
+ * @version    3.1 rc3
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @internal    @events OnManagerWelcomeHome,OnManagerMainFrameHeaderHTMLBlock
  * @internal    @installset base
@@ -13,12 +13,37 @@
  * @documentation Requirements: This plugin requires Evolution 1.3.1 or later
  * @reportissues https://github.com/Nicola1971/WelcomeStats-EvoDashboard-Plugin/issues
  * @link        
- * @lastupdate  30/08/2017
- * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly;show &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins 
+ * @lastupdate  26/09/2017
+ * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly,AdminExcluded,ThisRoleOnly,ThisUserOnly;All &ThisRole=Run only for this role:;string;;;(role id) &ThisUser=Run only for this user:;string;;;(username) &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins 
+ */
+/**
+ * DashboardStats
+ *
+ * Dashboard Stats widget plugin for Evolution CMS
+ * @author    Nicola Lambathakis
+ * @category    plugin
+ * @version    3.1 rc3
+ * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
+ * @internal    @events OnManagerWelcomeHome,OnManagerMainFrameHeaderHTMLBlock
+ * @internal    @installset base
+ * @internal    @modx_category Dashboard
+ * @author      Nicola Lambathakis http://www.tattoocms.it/
+ * @documentation Requirements: This plugin requires Evolution 1.3.1 or later
+ * @reportissues https://github.com/Nicola1971/WelcomeStats-EvoDashboard-Plugin/issues
+ * @link        
+ * @lastupdate  26/09/2017
+ * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly,AdminExcluded,ThisRoleOnly,ThisUserOnly;All &ThisRole=Run only for this role:;string;;;(role id) &ThisUser=Run only for this user:;string;;;(username) &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins 
  */
 // get manager role
-$role = $_SESSION['mgrRole'];          
+$role = $_SESSION['mgrRole'];
+// show widget only to Admin role 1
 if(($role!=1) AND ($wdgVisibility == 'AdminOnly')) {}
+// show widget to all manager users excluded Admin role 1
+else if(($role==1) AND ($wdgVisibility == 'AdminExcluded')) {}
+// show widget only to "this" role id
+else if(($role!=$ThisRole) AND ($wdgVisibility == 'ThisRoleOnly')) {}
+// show widget only to "this" username
+else if(($user!=$ThisUser) AND ($wdgVisibility == 'ThisUserOnly')) {}
 else {
 // get language
 global $modx,$_lang;

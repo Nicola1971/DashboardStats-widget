@@ -4,17 +4,17 @@
  * Dashboard Stats widget plugin for Evolution CMS
  * @author    Nicola Lambathakis
  * @category    plugin
- * @version    3.1 rc3
+ * @version    3.2
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @internal    @events OnManagerWelcomeHome,OnManagerMainFrameHeaderHTMLBlock
  * @internal    @installset base
  * @internal    @modx_category Dashboard
  * @author      Nicola Lambathakis http://www.tattoocms.it/
- * @documentation Requirements: This plugin requires Evolution 1.3.1 or later
+ * @documentation Requirements: This plugin requires Evolution 1.4 or later
  * @reportissues https://github.com/Nicola1971/WelcomeStats-EvoDashboard-Plugin/issues
  * @link        
- * @lastupdate  26/09/2017
- * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly,AdminExcluded,ThisRoleOnly,ThisUserOnly;All &ThisRole=Run only for this role:;string;;;(role id) &ThisUser=Run only for this user:;string;;;(username) &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins 
+ * @lastupdate  03/11/2017
+ * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly,AdminExcluded,ThisRoleOnly,ThisUserOnly;All &ThisRole=Run only for this role:;string;;;(role id) &ThisUser=Run only for this user:;string;;;(username) &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins &HeadBG= Widget Title Background color:;string; &HeadColor= Widget title color:;string; &BodyBG= Widget Body Background color:;string; &BodyColor= Widget Body text color:;string; 
  */
 /**
  * DashboardStats
@@ -22,17 +22,17 @@
  * Dashboard Stats widget plugin for Evolution CMS
  * @author    Nicola Lambathakis
  * @category    plugin
- * @version    3.1 rc3
+ * @version    3.2
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @internal    @events OnManagerWelcomeHome,OnManagerMainFrameHeaderHTMLBlock
  * @internal    @installset base
  * @internal    @modx_category Dashboard
  * @author      Nicola Lambathakis http://www.tattoocms.it/
- * @documentation Requirements: This plugin requires Evolution 1.3.1 or later
+ * @documentation Requirements: This plugin requires Evolution 1.4 or later
  * @reportissues https://github.com/Nicola1971/WelcomeStats-EvoDashboard-Plugin/issues
  * @link        
- * @lastupdate  26/09/2017
- * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly,AdminExcluded,ThisRoleOnly,ThisUserOnly;All &ThisRole=Show only to this role id:;string;;;enter the role id &ThisUser=Show only to this username:;string;;;enter the username &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins 
+ * @lastupdate  03/11/2017
+ * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly,AdminExcluded,ThisRoleOnly,ThisUserOnly;All &ThisRole=Run only for this role:;string;;;(role id) &ThisUser=Run only for this user:;string;;;(username) &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins &HeadBG= Widget Title Background color:;string; &HeadColor= Widget title color:;string; &BodyBG= Widget Body Background color:;string; &BodyColor= Widget Body text color:;string;
  */
 // get manager role
 $internalKey = $modx->getLoginUserID();
@@ -54,7 +54,10 @@ global $modx,$_lang;
 $result = $modx->db->select('id', $this->getFullTableName("site_plugins"), "name='{$modx->event->activePlugin}' AND disabled=0");
 $pluginid = $modx->db->getValue($result);
 if($modx->hasPermission('edit_plugin')) {
-$button_pl_config = '<a data-toggle="tooltip" href="javascript:;" title="' . $_lang["settings_config"] . '" class="text-muted pull-right" onclick="parent.modx.popup({url:\''. MODX_MANAGER_URL.'?a=102&id='.$pluginid.'&tab=1\',title1:\'' . $_lang["settings_config"] . '\',icon:\'fa-cog\',iframe:\'iframe\',selector2:\'#tabConfig\',position:\'center center\',width:\'80%\',height:\'80%\',wrap:\'evo-tab-page-home\',hide:0,hover:0,overlay:1,overlayclose:1})" ><i class="fa fa-cog"></i> </a>';
+/****
+$button_pl_config = '<span style="cursor:pointer"class="text-muted pull-right" onclick="window.parent.modx.popup({url:\'index.php?id='.$pluginid.'&a=102\',type:\'default\',title:\'  '.$wdgTitle.'\',icon:\''.$wdgicon.'\',position:\'center\', width: \'60rem\', height: \'40rem\',hide: 0,hover: 0,})" class="text-muted pull-right" ><i class="fa fa-cog"></i> </span>';
+***/
+$button_pl_config = '<a data-toggle="tooltip" href="javascript:;" title="' . $_lang["settings_config"] . '" class="text-muted pull-right" onclick="parent.modx.popup({url:\''. MODX_MANAGER_URL.'?a=102&id='.$pluginid.'&tab=1\',title1:\'' . $_lang["settings_config"] . '\',icon:\'fa-cog\',iframe:\'iframe\',selector2:\'#tabConfig\',position:\'center center\',width:\'80%\',height:\'80%\',wrap:\'evo-tab-page-home\',hide:0,hover:0,overlay:1,overlayclose:1})" ><i style="color:'.$HeadColor.';" class="fa fa-cog"></i> </a>';
 }
 $modx->setPlaceholder('button_pl_config', $button_pl_config);
 //styles
@@ -140,6 +143,8 @@ case 'OnManagerWelcomeHome':
 				'menuindex' =>'1',
 				'id' => 'DashboardStats'.$pluginid.'',
 				'cols' => 'col-md-'.$wdgsizex.'',
+                'headAttr' => 'style="background-color:'.$HeadBG.'; color:'.$HeadColor.';"',
+				'bodyAttr' => 'style="background-color:'.$BodyBG.'; color:'.$BodyColor.';"',
 				'icon' => ''.$wdgicon.'',
 				'title' => ''.$wdgTitle.' '.$button_pl_config.'',
 				'body' => '<div class="col-md-12 col-sm-12 statcontainer">'.$WidgetOutput.' </div>'

@@ -50,10 +50,18 @@ $num = $modx->db->getRecordCount($resource);
 // webusers counter
 $webGroup = isset($webGroup) ? $webGroup : '';
 // from: ShowMembers v1.1c
-$wua= $modx->getFullTableName('web_user_attributes');
-$wgn= $modx->getFullTableName('webgroup_names');
-$wg= $modx->getFullTableName('web_groups');
-
+// Added to allow for working with v1, v2 and v3
+if ( substr($modx->config['settings_version'],0,1) < 3 )
+{
+	$wua= $modx->getFullTableName('web_user_attributes');
+	$wgn= $modx->getFullTableName('webgroup_names');
+	$wg= $modx->getFullTableName('web_groups');
+} else {
+	$wua= $modx->getFullTableName('user_attributes');
+	$wgn= $modx->getFullTableName('membergroup_names');
+	$wg= $modx->getFullTableName('member_groups');
+}
+	
 if($webGroup == "all") {
   $sql= "SELECT (wua.id) FROM {$wua} wua ORDER BY wua.fullname ASC";
 } else {
@@ -116,9 +124,9 @@ $e = &$modx->Event;
 switch($e->name){
 /*load styles with OnManagerMainFrameHeaderHTMLBlock*/
 case 'OnManagerMainFrameHeaderHTMLBlock':
-	if ($Style == box) {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/box.css">';}
-    if ($Style == round) {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/round.css">';}
-    if ($Style == lite) {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/lite.css">';}
+   if ($Style == 'box') {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/box.css">';}
+   if ($Style == 'round') {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/round.css">';}
+   if ($Style == 'lite') {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/lite.css">';}
 		$e->output($cssOutput);
 break;
 case 'OnManagerWelcomeHome':

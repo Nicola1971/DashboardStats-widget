@@ -17,6 +17,14 @@
  * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly,AdminExcluded,ThisRoleOnly,ThisUserOnly;All &ThisRole=Run only for this role:;string;;;(role id) &ThisUser=Run only for this user:;string;;;(username) &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins &HeadBG= Widget Title Background color:;string; &HeadColor= Widget title color:;string; &BodyBG= Widget Body Background color:;string; &BodyColor= Widget Body text color:;string;
  */
 // get manager role
+$HeadColor = '';
+$BodyColor = '';
+$HeadBG = '';
+$BodyBG = '';
+$LastUsersA = '';
+$ThisUser = '';
+$ThisRole = '';
+
 $internalKey = $modx->getLoginUserID();
 $sid = $modx->sid;
 $role = $_SESSION['mgrRole'];

@@ -21,6 +21,19 @@ $internalKey = $modx->getLoginUserID();
 $sid = $modx->sid;
 $role = $_SESSION['mgrRole'];
 $user = $_SESSION['mgrShortname'];
+
+
+// Added for php v8.0
+// When plugin variables are blank then an error occurs. 
+// This prevents blank variables from throwing an error
+$LastUsersA = isset($LastUsersA) ? $LastUsersA : '';
+$HeadColor = isset($HeadColor) ? $HeadColor : '';
+$HeadBG = isset($HeadBG) ? $HeadBG : '';
+$BodyColor = isset($BodyColor) ? $BodyColor : '';
+$BodyBG = isset($BodyBG) ? $BodyBG : '';
+$ThisRole = isset($ThisRole) ? $ThisRole : '';
+$ThisUser = isset($ThisUser) ? $ThisUser : '';
+
 // show widget only to Admin role 1
 if(($role!=1) AND ($wdgVisibility == 'AdminOnly')) {}
 // show widget to all manager users excluded Admin role 1

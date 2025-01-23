@@ -4,7 +4,7 @@
  * Dashboard Stats widget plugin for Evolution CMS
  * @author    Nicola Lambathakis
  * @category    plugin
- * @version    3.2.3
+ * @version    3.2.4
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @internal    @events OnManagerWelcomeHome,OnManagerMainFrameHeaderHTMLBlock
  * @internal    @installset base
@@ -144,7 +144,7 @@ case 'OnManagerMainFrameHeaderHTMLBlock':
 break;
 case 'OnManagerWelcomeHome':
 			$widgets['test'] = array(
-				'menuindex' =>'1',
+				'menuindex' =>''.$wdgposition.'',
 				'id' => 'DashboardStats'.$pluginid.'',
 				'cols' => 'col-md-'.$wdgsizex.'',
                 'headAttr' => 'style="background-color:'.$HeadBG.'; color:'.$HeadColor.';"',

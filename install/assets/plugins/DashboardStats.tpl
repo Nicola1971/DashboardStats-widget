@@ -4,7 +4,7 @@
  * Dashboard Stats widget plugin for Evolution CMS
  * @author    Nicola Lambathakis
  * @category    plugin
- * @version    3.2.4
+ * @version    3.2.5
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @internal    @events OnManagerWelcomeHome,OnManagerMainFrameHeaderHTMLBlock
  * @internal    @installset base
@@ -13,147 +13,196 @@
  * @documentation Requirements: This plugin requires Evolution 1.4 or later
  * @reportissues https://github.com/Nicola1971/WelcomeStats-EvoDashboard-Plugin/issues
  * @link
- * @lastupdate  23/01/2025
+ * @lastupdate  12/11/2026
  * @internal    @properties &wdgVisibility=Show widget for:;menu;All,AdminOnly,AdminExcluded,ThisRoleOnly,ThisUserOnly;All &ThisRole=Run only for this role:;string;;;(role id) &ThisUser=Run only for this user:;string;;;(username) &wdgTitle= Stats widget Title:;string;Evo Stats  &wdgicon= widget icon:;string;fa-bar-chart-o  &Style= Style:;list;box,round,lite;box &wdgposition=widget position:;text;1 &wdgsizex=widget width:;list;12,6,4,3;12 &DocCountLabel= Documents count label:;string;Documents &startID= Documents count parent:;string;0 &WebUserCountLabel= Web Users label:;string;Web Users &webGroup= Users Web Group:;string;all &UserCountLabel= Manager Users label:;string;Manager Users &AdminCountLabel= Admin label:;string;Admins &HeadBG= Widget Title Background color:;string; &HeadColor= Widget title color:;string; &BodyBG= Widget Body Background color:;string; &BodyColor= Widget Body text color:;string;
  */
-// get manager role
-$internalKey = $modx->getLoginUserID();
-$sid = $modx->sid;
-$role = $_SESSION['mgrRole'];
-$user = $_SESSION['mgrShortname'];
+// get manager role and username
+$role = (int)($_SESSION['mgrRole'] ?? 0);
+$user = (string)($_SESSION['mgrShortname'] ?? '');
 
+// PHP 8: default for every property (a configuration saved with an older
+// version of the plugin may not contain all of them)
+$wdgVisibility     = (string)($wdgVisibility ?? 'All');
+$ThisRole          = trim((string)($ThisRole ?? ''));
+$ThisUser          = trim((string)($ThisUser ?? ''));
+$wdgTitle          = (string)($wdgTitle ?? 'Evo Stats');
+$wdgicon           = (string)($wdgicon ?? 'fa-bar-chart-o');
+$Style             = (string)($Style ?? 'box');
+$wdgposition       = (string)($wdgposition ?? '1');
+$wdgsizex          = (string)($wdgsizex ?? '12');
+$DocCountLabel     = (string)($DocCountLabel ?? 'Documents');
+$startID           = trim((string)($startID ?? '0'));
+$WebUserCountLabel = (string)($WebUserCountLabel ?? 'Web Users');
+$webGroup          = trim((string)($webGroup ?? 'all'));
+$UserCountLabel    = (string)($UserCountLabel ?? 'Manager Users');
+$AdminCountLabel   = (string)($AdminCountLabel ?? 'Admins');
+$HeadBG            = (string)($HeadBG ?? '');
+$HeadColor         = (string)($HeadColor ?? '');
+$BodyBG            = (string)($BodyBG ?? '');
+$BodyColor         = (string)($BodyColor ?? '');
 
-// Added for php v8.0
-// When plugin variables are blank then an error occurs. 
-// This prevents blank variables from throwing an error
-$LastUsersA = isset($LastUsersA) ? $LastUsersA : '';
-$HeadColor = isset($HeadColor) ? $HeadColor : '';
-$HeadBG = isset($HeadBG) ? $HeadBG : '';
-$BodyColor = isset($BodyColor) ? $BodyColor : '';
-$BodyBG = isset($BodyBG) ? $BodyBG : '';
-$ThisRole = isset($ThisRole) ? $ThisRole : '';
-$ThisUser = isset($ThisUser) ? $ThisUser : '';
-
-// show widget only to Admin role 1
-if(($role!=1) AND ($wdgVisibility == 'AdminOnly')) {}
-// show widget to all manager users excluded Admin role 1
-else if(($role==1) AND ($wdgVisibility == 'AdminExcluded')) {}
-// show widget only to "this" role id
-else if(($role!=$ThisRole) AND ($wdgVisibility == 'ThisRoleOnly')) {}
-// show widget only to "this" username
-else if(($user!=$ThisUser) AND ($wdgVisibility == 'ThisUserOnly')) {}
-else {
-// get language
-global $modx,$_lang;
-// get plugin id
-$result = $modx->db->select('id', $this->getFullTableName("site_plugins"), "name='{$modx->event->activePlugin}' AND disabled=0");
-$pluginid = $modx->db->getValue($result);
-if($modx->hasPermission('edit_plugin')) {
-$button_pl_config = '<a data-toggle="tooltip" href="javascript:;" title="' . $_lang["settings_config"] . '" class="text-muted pull-right float-right" onclick="parent.modx.popup({url:\''. MODX_MANAGER_URL.'?a=102&id='.$pluginid.'&tab=1\',title1:\'' . $_lang["settings_config"] . '\',icon:\'fa-cog\',iframe:\'iframe\',selector2:\'#tabConfig\',position:\'center center\',width:\'80%\',height:\'80%\',hide:0,hover:0,overlay:1,overlayclose:1})" ><i class="fa fa-cog"></i> </a>';
+if (!in_array($Style, array('box', 'round', 'lite'), true)) {
+    $Style = 'box';
 }
-$modx->setPlaceholder('button_pl_config', $button_pl_config);
-//styles
-$Style = isset($Style) ? $Style : 'box';
-// documents counter
-$doctable = $modx->getFullTableName('site_content');
-$countDocQuery = "SELECT (id) FROM $doctable";
-$resource = $modx->db->query($countDocQuery);
-$num = $modx->db->getRecordCount($resource);
-
-// webusers counter
-$webGroup = isset($webGroup) ? $webGroup : '';
-// from: ShowMembers v1.1c
-// Added to allow for working with v1, v2 and v3
-if ( substr($modx->config['settings_version'],0,1) < 3 )
-{
-	$wua= $modx->getFullTableName('web_user_attributes');
-	$wgn= $modx->getFullTableName('webgroup_names');
-	$wg= $modx->getFullTableName('web_groups');
-} else {
-	$wua= $modx->getFullTableName('user_attributes');
-	$wgn= $modx->getFullTableName('membergroup_names');
-	$wg= $modx->getFullTableName('member_groups');
+if (!in_array($wdgsizex, array('12', '6', '4', '3'), true)) {
+    $wdgsizex = '12';
 }
-	
-if($webGroup == "all") {
-  $sql= "SELECT (wua.id) FROM {$wua} wua ORDER BY wua.fullname ASC";
-} else {
-  $sql= "SELECT (wua.id) FROM {$wua} wua JOIN {$wg} wg ON wg.webuser = wua.internalKey JOIN {$wgn} wgn ON wgn.name
-
-= '{$webGroup}' AND wgn.id = wg.webgroup ORDER BY wua.fullname ASC";
+if ($webGroup === '') {
+    $webGroup = 'all';
 }
 
-$webusers = $modx->db->query($sql);
-$count = $modx->db->getRecordCount($webusers);
-// end users counter
+// widget visibility
+$showWidget = true;
+switch ($wdgVisibility) {
+    case 'AdminOnly':
+        $showWidget = ($role === 1);
+        break;
+    case 'AdminExcluded':
+        $showWidget = ($role !== 1);
+        break;
+    case 'ThisRoleOnly':
+        $showWidget = ($ThisRole !== '' && $role === (int)$ThisRole);
+        break;
+    case 'ThisUserOnly':
+        $showWidget = ($ThisUser !== '' && $user === $ThisUser);
+        break;
+}
 
-$userstable = $modx->getFullTableName('user_attributes');
-$countusersQuery = "SELECT (id) FROM $userstable WHERE role > 1";
-$users = $modx->db->query($countusersQuery);
-$userscount = $modx->db->getRecordCount($users);
+if ($showWidget) {
+    $e = &$modx->Event;
+    switch ($e->name) {
+        /* load styles with OnManagerMainFrameHeaderHTMLBlock */
+        case 'OnManagerMainFrameHeaderHTMLBlock':
+            $e->output('<link type="text/css" rel="stylesheet" href="' . MODX_SITE_URL . 'assets/plugins/dashboardstats/' . $Style . '.css">');
+            break;
 
-$countAdminQuery = "SELECT (id) FROM $userstable WHERE role = 1";
-$admins = $modx->db->query($countAdminQuery);
-$admincount = $modx->db->getRecordCount($admins);
+        case 'OnManagerWelcomeHome':
+            global $_lang;
+            $charset = $modx->config['modx_charset'] ?? 'UTF-8';
+            $h = function ($s) use ($charset) {
+                return htmlspecialchars((string)$s, ENT_QUOTES, $charset);
+            };
 
+            // get plugin id
+            $pluginName = $modx->db->escape((string)$modx->event->activePlugin);
+            $pluginid = (int)$modx->db->getValue(
+                $modx->db->select('id', $modx->getFullTableName('site_plugins'), "name='{$pluginName}' AND disabled=0")
+            );
 
-/*Widget Box */
+            // config button
+            $button_pl_config = '';
+            if ($modx->hasPermission('edit_plugin')) {
+                $cfgLabel = (string)($_lang['settings_config'] ?? 'Configuration');
+                $cfgJs = $h(addslashes($cfgLabel));
+                $button_pl_config = '<a data-toggle="tooltip" href="javascript:;" title="' . $h($cfgLabel) . '" class="text-muted pull-right float-right" onclick="parent.modx.popup({url:\'' . MODX_MANAGER_URL . '?a=102&id=' . $pluginid . '&tab=1\',title1:\'' . $cfgJs . '\',icon:\'fa-cog\',iframe:\'iframe\',selector2:\'#tabConfig\',position:\'center center\',width:\'80%\',height:\'80%\',hide:0,hover:0,overlay:1,overlayclose:1})" ><i class="fa fa-cog"></i> </a>';
+            }
+            $modx->setPlaceholder('button_pl_config', $button_pl_config);
 
-$WidgetOutput = '
+            // documents counter
+            // &startID: 0 (or empty) = all documents; otherwise one or more parent ids
+            // (comma separated): counts all their descendants, at any depth
+            $doctable = $modx->getFullTableName('site_content');
+            $startParents = array();
+            foreach (explode(',', $startID) as $pid) {
+                $pid = (int)trim($pid);
+                if ($pid > 0) {
+                    $startParents[$pid] = $pid;
+                }
+            }
+            if (empty($startParents)) {
+                $num = (int)$modx->db->getValue($modx->db->select('COUNT(*)', $doctable));
+            } else {
+                $found = array();
+                $level = array_values($startParents);
+                while (!empty($level)) {
+                    $rs = $modx->db->select('id', $doctable, 'parent IN (' . implode(',', $level) . ')');
+                    $next = array();
+                    while ($row = $modx->db->getRow($rs)) {
+                        $cid = (int)$row['id'];
+                        if (!isset($found[$cid]) && !isset($startParents[$cid])) {
+                            $found[$cid] = true;
+                            $next[] = $cid;
+                        }
+                    }
+                    $level = $next;
+                }
+                $num = count($found);
+            }
+
+            // web users counter (from: ShowMembers v1.1c)
+            $settingsVersion = (string)($modx->config['settings_version'] ?? '');
+            if ((int)substr($settingsVersion, 0, 1) < 3) {
+                $wua = $modx->getFullTableName('web_user_attributes');
+                $wgn = $modx->getFullTableName('webgroup_names');
+                $wg  = $modx->getFullTableName('web_groups');
+            } else {
+                $wua = $modx->getFullTableName('user_attributes');
+                $wgn = $modx->getFullTableName('membergroup_names');
+                $wg  = $modx->getFullTableName('member_groups');
+            }
+            if ($webGroup === 'all') {
+                $sql = "SELECT COUNT(*) FROM {$wua} wua";
+            } else {
+                $webGroupEsc = $modx->db->escape($webGroup);
+                $sql = "SELECT COUNT(*) FROM {$wua} wua
+                        JOIN {$wg} wg ON wg.webuser = wua.internalKey
+                        JOIN {$wgn} wgn ON wgn.name = '{$webGroupEsc}' AND wgn.id = wg.webgroup";
+            }
+            $count = (int)$modx->db->getValue($modx->db->query($sql));
+
+            // manager users / admins counters
+            $userstable = $modx->getFullTableName('user_attributes');
+            $userscount = (int)$modx->db->getValue($modx->db->select('COUNT(*)', $userstable, 'role > 1'));
+            $admincount = (int)$modx->db->getValue($modx->db->select('COUNT(*)', $userstable, 'role = 1'));
+
+            /* Widget Box */
+            $WidgetOutput = '
 <div class="container">
 <div class="row">
 <div class="col-lg-3 col-sm-6 col-xs-6">
 <div class="statbox sblue">
-<div class="staticon"><i title="'.$DocCountLabel.'" class="fa fa-file fa-4x"></i></div>
-<div class="count"><h3> '.$num.' </h3> '.$DocCountLabel.' </div>
+<div class="staticon"><i title="' . $h($DocCountLabel) . '" class="fa fa-file fa-4x"></i></div>
+<div class="count"><h3> ' . $num . ' </h3> ' . $h($DocCountLabel) . ' </div>
 </div>
 </div>
 
 <div class="col-lg-3 col-sm-6 col-xs-6">
 <div class="statbox sgreen">
-<div class="staticon"><i title="'.$WebUserCountLabel.'" class="fa fa-users fa-4x"></i></div>
-<div class="count"><h3 class="counter"> '.$count.' </h3> '.$WebUserCountLabel.' </div>
+<div class="staticon"><i title="' . $h($WebUserCountLabel) . '" class="fa fa-users fa-4x"></i></div>
+<div class="count"><h3 class="counter"> ' . $count . ' </h3> ' . $h($WebUserCountLabel) . ' </div>
 </div>
 </div>
 
 <div class="col-lg-3 col-sm-6 col-xs-6">
 <div class="statbox syellow">
-<div class="staticon"><i title="'.$UserCountLabel.'" class="fa fa-user fa-4x"></i></div>
-<div class="count"><h3 class="counter"> '.$userscount.' </h3> '.$UserCountLabel.' </div>
+<div class="staticon"><i title="' . $h($UserCountLabel) . '" class="fa fa-user fa-4x"></i></div>
+<div class="count"><h3 class="counter"> ' . $userscount . ' </h3> ' . $h($UserCountLabel) . ' </div>
 </div>
 </div>
 
 <div class="col-lg-3 col-sm-6 col-xs-6">
 <div class="statbox sred">
-<div class="staticon"><i title="'.$AdminCountLabel.'" class="fa fa-user-md fa-4x"></i></div>
-<div class="count"><h3 class="counter"> '.$admincount.' </h3> '.$AdminCountLabel.' </div>
+<div class="staticon"><i title="' . $h($AdminCountLabel) . '" class="fa fa-user-md fa-4x"></i></div>
+<div class="count"><h3 class="counter"> ' . $admincount . ' </h3> ' . $h($AdminCountLabel) . ' </div>
 </div>
 </div>
 </div>
 </div>
 ';
 
-$e = &$modx->Event;
-switch($e->name){
-/*load styles with OnManagerMainFrameHeaderHTMLBlock*/
-case 'OnManagerMainFrameHeaderHTMLBlock':
-   if ($Style == 'box') {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/box.css">';}
-   if ($Style == 'round') {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/round.css">';}
-   if ($Style == 'lite') {$cssOutput = '<link type="text/css" rel="stylesheet" href="../assets/plugins/dashboardstats/lite.css">';}
-		$e->output($cssOutput);
-break;
-case 'OnManagerWelcomeHome':
-			$widgets['test'] = array(
-				'menuindex' =>''.$wdgposition.'',
-				'id' => 'DashboardStats'.$pluginid.'',
-				'cols' => 'col-md-'.$wdgsizex.'',
-                'headAttr' => 'style="background-color:'.$HeadBG.'; color:'.$HeadColor.';"',
-				'bodyAttr' => 'style="background-color:'.$BodyBG.'; color:'.$BodyColor.';"',
-				'icon' => ''.$wdgicon.'',
-				'title' => ''.$wdgTitle.' '.$button_pl_config.'',
-				'body' => '<div class="col-lg-12 col-md-12 col-sm-12 statcontainer">'.$WidgetOutput.' </div>'
-			);
+            // add the widget to the system widgets (do not replace the array)
+            $widgets = (isset($widgets) && is_array($widgets)) ? $widgets : array();
+            $widgets['DashboardStats'] = array(
+                'menuindex' => $wdgposition,
+                'id'        => 'DashboardStats' . $pluginid,
+                'cols'      => 'col-md-' . $wdgsizex,
+                'headAttr'  => 'style="background-color:' . $h($HeadBG) . '; color:' . $h($HeadColor) . ';"',
+                'bodyAttr'  => 'style="background-color:' . $h($BodyBG) . '; color:' . $h($BodyColor) . ';"',
+                'icon'      => $h($wdgicon),
+                'title'     => $h($wdgTitle) . ' ' . $button_pl_config,
+                'body'      => '<div class="col-lg-12 col-md-12 col-sm-12 statcontainer">' . $WidgetOutput . ' </div>'
+            );
             $e->output(serialize($widgets));
-    break;
-}
+            break;
+    }
 }
